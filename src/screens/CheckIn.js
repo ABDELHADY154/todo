@@ -5,7 +5,7 @@ export default class Notification extends Component {
   render() {
     return (
       <View style={styles.container}>
-        <Text>Notification!</Text>
+        <Text>Check In!</Text>
       </View>
     );
   }
@@ -16,5 +16,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: "#fff",
   },
 });
