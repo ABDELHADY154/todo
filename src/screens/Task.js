@@ -21,7 +21,7 @@ export default class Task extends Component {
     incomplete: [],
     completed: [],
   };
-  componentDidMount = async () => {
+  getAllTasksHandler = async () => {
     var userToken = await SecureStore.getItemAsync("userToken");
     axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
     await axios
@@ -36,6 +36,42 @@ export default class Task extends Component {
         console.log(error.response.data);
       });
   };
+  componentDidMount = async () => {
+    this.getAllTasksHandler();
+  };
+
+  deleteTaskHandler = async id => {
+    await axios.delete(`/task/${id}`).then(response => {
+      this.getAllTasksHandler();
+    });
+  };
+  checkTaskDoneHandler = async id => {
+    var body = {
+      completed: 1,
+    };
+    await axios
+      .put(`/task/${id}`, body)
+      .then(response => {
+        this.getAllTasksHandler();
+      })
+      .catch(err => {
+        console.log(err.response);
+      });
+  };
+  unCheckTaskHandler = async id => {
+    var body = {
+      completed: 0,
+    };
+    await axios
+      .put(`/task/${id}`, body)
+      .then(response => {
+        this.getAllTasksHandler();
+      })
+      .catch(err => {
+        console.log(err.response);
+      });
+  };
+
   render() {
     return (
       <View style={styles.container}>
@@ -48,8 +84,7 @@ export default class Task extends Component {
         >
           <TouchableOpacity
             onPress={() => {
-              // this.props.navigation.navigate("Add");
-              this.props.logout();
+              this.props.navigation.push("Home", { screen: "Add" });
             }}
           >
             <Text
@@ -75,62 +110,72 @@ export default class Task extends Component {
           >
             Incomplete
           </Text>
-          {this.state.incomplete.map(task => {
-            var options = {
-              month: "short",
-              day: "2-digit",
-              hour: "2-digit",
-              minute: "2-digit",
-            };
+          {this.state.incomplete.length !== 0 &&
+            this.state.incomplete.map(task => {
+              if (task.due_date) {
+                var options = {
+                  month: "short",
+                  day: "2-digit",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                };
 
-            let date = new Date(
-              task.due_date.split("-")[0] +
-                "/" +
-                task.due_date.split("-")[1] +
-                "/" +
-                task.due_date.split("-")[2],
-            );
-            let dueDate = date.toLocaleString("en-us", options);
+                let date = new Date(
+                  task.due_date.split("-")[0] +
+                    "/" +
+                    task.due_date.split("-")[1] +
+                    "/" +
+                    task.due_date.split("-")[2],
+                );
 
-            return (
-              <ListItem.Swipeable
-                key={task.id}
-                leftContent={reset => (
-                  <Button
-                    title="Info"
-                    onPress={() => reset()}
-                    icon={{ name: "info", color: "white" }}
-                    buttonStyle={{ minHeight: "100%" }}
-                  />
-                )}
-                rightContent={reset => (
-                  <Button
-                    title=""
-                    onPress={() => reset()}
-                    icon={{ name: "delete", color: "white", size: 24 }}
-                    buttonStyle={{ minHeight: "100%", backgroundColor: "red" }}
-                  />
-                )}
-              >
-                <Checkbox
-                  color="#000"
-                  onChange={() => {}}
-                  flexDirection="row-reverse"
-                  label=""
-                />
-                <ListItem.Content>
-                  <ListItem.Title>{task.summary}</ListItem.Title>
-                  <ListItem.Subtitle
-                    style={{
-                      marginTop: "3%",
+                var dueDate = date.toLocaleString("en-us", options);
+              }
+
+              return (
+                <ListItem.Swipeable
+                  key={task.id}
+                  rightContent={reset => (
+                    <Button
+                      title=""
+                      onPress={() => {
+                        this.deleteTaskHandler(task.id);
+                        reset();
+                      }}
+                      icon={{ name: "delete", color: "white", size: 24 }}
+                      buttonStyle={{
+                        minHeight: "100%",
+                        backgroundColor: "red",
+                      }}
+                    />
+                  )}
+                >
+                  <Checkbox
+                    color="#000"
+                    onChange={() => {
+                      this.checkTaskDoneHandler(task.id);
                     }}
-                  >
-                    ⏰ {dueDate}
-                  </ListItem.Subtitle>
-                </ListItem.Content>
-              </ListItem.Swipeable>
-            );
-          })}
+                    flexDirection="row-reverse"
+                    label=""
+                    checkboxStyle={{
+                      backgroundColor: "#FCFCFC",
+                      borderColor: "#DADADA",
+                    }}
+                  />
+                  <ListItem.Content>
+                    <ListItem.Title>{task.summary}</ListItem.Title>
+                    {task.due_date && (
+                      <ListItem.Subtitle
+                        style={{
+                          marginTop: "3%",
+                        }}
+                      >
+                        ⏰ {dueDate}
+                      </ListItem.Subtitle>
+                    )}
+                  </ListItem.Content>
+                </ListItem.Swipeable>
+              );
+            })}
           <Text
             style={{
               color: "#575767",
@@ -157,7 +202,10 @@ export default class Task extends Component {
                 rightContent={reset => (
                   <Button
                     title=""
-                    onPress={() => reset()}
+                    onPress={() => {
+                      this.deleteTaskHandler(task.id);
+                      reset();
+                    }}
                     icon={{ name: "delete", color: "white" }}
                     buttonStyle={{ minHeight: "100%", backgroundColor: "red" }}
                   />
@@ -165,15 +213,17 @@ export default class Task extends Component {
               >
                 <Checkbox
                   color="#000"
-                  onChange={() => {}}
+                  onChange={() => {
+                    this.unCheckTaskHandler(task.id);
+                  }}
                   flexDirection="row-reverse"
                   label=""
                   initialValue={true}
                   checkboxStyle={{
                     backgroundColor: "#FCFCFC",
+                    borderColor: "#DADADA",
                   }}
                   iconColor="#000"
-                  disabled
                 />
                 <ListItem.Content>
                   <ListItem.Title

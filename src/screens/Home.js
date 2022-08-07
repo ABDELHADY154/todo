@@ -12,6 +12,7 @@ import { Foundation } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { axios } from "../config/Axios";
+import { Button } from "react-native-elements";
 
 const Tab = createBottomTabNavigator();
 export default class Home extends Component {
@@ -33,6 +34,19 @@ export default class Home extends Component {
 
     return (
       <Task
+        {...props}
+        navigation={navigation}
+        logout={() => {
+          this.removeToken();
+        }}
+      />
+    );
+  };
+  AddScreen = props => {
+    const navigation = useNavigation();
+
+    return (
+      <Add
         {...props}
         navigation={navigation}
         logout={() => {
@@ -88,8 +102,41 @@ export default class Home extends Component {
 
         <Tab.Screen
           name="Add"
-          component={Add}
+          component={this.AddScreen}
           options={{
+            headerShown: true,
+            headerStyle: {
+              height: 130,
+              borderBottomWidth: 0,
+              borderColor: "#fff",
+            },
+
+            headerTitleStyle: {
+              color: "#000",
+              fontWeight: "600",
+              fontSize: 30,
+            },
+            headerLeft: () => {
+              return (
+                <Button
+                  title="Back"
+                  titleStyle={{
+                    color: "#000",
+                    fontSize: 18,
+                    fontWeight: "500",
+                  }}
+                  onPress={() => {
+                    this.props.navigation.goBack();
+                  }}
+                  buttonStyle={{
+                    backgroundColor: "transparent",
+                  }}
+                />
+              );
+            },
+            headerShadowVisible: false,
+            headerBackTitleVisible: false,
+            title: "New Task",
             tabBarIcon: ({ tintColor }) => {
               return (
                 <View
