@@ -157,6 +157,7 @@ export default class Add extends Component {
               <DateTimePicker
                 mode="datetime"
                 display="spinner"
+                textColor="#000"
                 value={this.state.date ? this.state.date : new Date()}
                 onChange={(event, date) => {
                   this.setState({ date: date });

@@ -15,6 +15,7 @@ import { Checkbox } from "galio-framework";
 
 import { ListItem } from "@rneui/themed";
 import { Button } from "react-native-elements";
+import { schedulePushNotification } from "../config/Notification";
 
 export default class Task extends Component {
   state = {
@@ -35,6 +36,18 @@ export default class Task extends Component {
       .catch(error => {
         console.log(error.response.data);
       });
+    this.state.incomplete.map(task => {
+      var date = task.due_date.split(" ")[0];
+      var day = new Date(date).getDay();
+
+      schedulePushNotification(
+        task.summary,
+        task.desc,
+        "Task Reminder",
+        new Date(date),
+        day + 1,
+      );
+    });
   };
   componentDidMount = async () => {
     this.getAllTasksHandler();
@@ -84,7 +97,8 @@ export default class Task extends Component {
         >
           <TouchableOpacity
             onPress={() => {
-              this.props.navigation.push("Home", { screen: "Add" });
+              this.props.logout();
+              // this.props.navigation.push("Home", { screen: "Add" });
             }}
           >
             <Text

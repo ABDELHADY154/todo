@@ -6,6 +6,9 @@ import * as SecureStore from "expo-secure-store";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import SignInScreen from "./src/screens/SignInScreen";
 import { useNavigation } from "@react-navigation/native";
+import Notification, {
+  schedulePushNotification,
+} from "./src/config/Notification";
 
 const Stack = createNativeStackNavigator();
 const AuthContext = React.createContext();
@@ -59,6 +62,7 @@ export default function App() {
       userToken: null,
     },
   );
+  Notification();
 
   React.useEffect(() => {
     const bootstrapAsync = async () => {
