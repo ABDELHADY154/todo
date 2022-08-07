@@ -43,11 +43,9 @@ export default class Add extends Component {
     await axios
       .post("/task", body)
       .then(response => {
-        console.log(response.data.response);
         this.props.navigation.push("Home", { screen: "Task" });
       })
       .catch(error => {
-        console.log(error.response);
         if (error.response.data.errors.summary) {
           this.setState({ summaryErr: error.response.data.errors.summary });
         }
