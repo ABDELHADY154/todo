@@ -10,16 +10,37 @@ import CheckIn from "./CheckIn";
 import { FontAwesome5 } from "@expo/vector-icons";
 import { Foundation } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
+import { axios } from "../config/Axios";
 
 const Tab = createBottomTabNavigator();
 export default class Home extends Component {
-  async storeToken() {
+  async removeToken() {
     try {
       await SecureStore.deleteItemAsync("userToken");
     } catch (error) {
       console.log("Something went wrong", error);
     }
   }
+  componentDidMount = async () => {
+    var userToken = await SecureStore.getItemAsync("userToken");
+
+    axios.defaults.headers.common["Authorization"] = `Bearer ${userToken}`;
+  };
+
+  TaskScreen = props => {
+    const navigation = useNavigation();
+
+    return (
+      <Task
+        {...props}
+        navigation={navigation}
+        logout={() => {
+          this.removeToken();
+        }}
+      />
+    );
+  };
   render() {
     return (
       <Tab.Navigator
@@ -41,7 +62,7 @@ export default class Home extends Component {
       >
         <Tab.Screen
           name="Task"
-          component={Task}
+          component={this.TaskScreen}
           options={{
             headerShown: true,
             headerStyle: {
