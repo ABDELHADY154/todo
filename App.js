@@ -74,10 +74,10 @@ export default function App() {
 
       try {
         userToken = await SecureStore.getItemAsync("userToken");
+        TestFairy.begin("SDK-b41T2BIH");
       } catch (e) {}
       dispatch({ type: "RESTORE_TOKEN", token: userToken });
     };
-    TestFairy.begin("SDK-b41T2BIH");
 
     bootstrapAsync();
   }, []);
