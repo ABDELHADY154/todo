@@ -13,6 +13,10 @@ import Notification, {
 const Stack = createNativeStackNavigator();
 const AuthContext = React.createContext();
 
+const TestFairy = require("react-native-testfairy");
+// componentWillMount: function() {
+//    TestFairy.begin("SDK-b41T2BIH");
+// }
 function SignIn(props) {
   const navigation = useNavigation();
   const { signIn } = React.useContext(AuthContext);
@@ -73,6 +77,7 @@ export default function App() {
       } catch (e) {}
       dispatch({ type: "RESTORE_TOKEN", token: userToken });
     };
+    TestFairy.begin("SDK-b41T2BIH");
 
     bootstrapAsync();
   }, []);
